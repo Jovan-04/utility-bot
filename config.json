@@ -1,0 +1,11 @@
+{
+  "username": "",
+  "auth": "",
+  "host": "",
+  "port": 25565,
+  "version": "",
+
+  "inventoryViewerPort": 3000,
+  "worldViewerPort": 3001,
+  "worldViewerFirstPerson": false
+}
