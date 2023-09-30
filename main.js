@@ -8,7 +8,7 @@
 
 // load mineflayer-related libraries
 const mineflayer = require('mineflayer')
-const { pathfinder, Movements, goals: { GoalBlock, GoalNear, GoalGetToBlock } } = require('mineflayer-pathfinder')
+const { pathfinder, Movements } = require('mineflayer-pathfinder')
 const inventoryViewer = require('mineflayer-web-inventory')
 const mineflayerViewer = require('prismarine-viewer').mineflayer
 
@@ -16,11 +16,12 @@ const mineflayerViewer = require('prismarine-viewer').mineflayer
 const readline = require('readline')
 
 // import everything from project files
-const { username, auth, host, port, version, inventoryViewerPort, worldViewerPort, worldViewerFirstPerson } = require('./config.json')
-const { sleep, readlineLog } = require('./utils.js')
+const { username, auth, host, port, version, inventoryViewerPort, worldViewerPort, worldViewerFirstPerson, controlMessagesFromChat, acceptedControllers, commandRegex } = require('./config.json')
+const { sleep, readlineLog, Queue } = require('./utils.js')
 
 // join the minecraft server
-const bot = mineflayer.createBot({ username, auth, host, port, version })
+const bot = mineflayer.createBot({ username, auth, host, port, version, defaultChatPatterns: false })
+bot.commandQueue = new Queue() // to be used later for a command queue
 
 // creates our readline interface with our console as input and output
 global.rl = readline.createInterface({
@@ -33,6 +34,9 @@ bot.once('spawn', () => {
   bot.loadPlugin(pathfinder)
   const movements = new Movements(bot)
   bot.pathfinder.setMovements(movements)
+
+  // if config.json says we should allow commands through chat, add a listener with the custom regex
+  if (controlMessagesFromChat) bot.addChatPattern('command', new RegExp(commandRegex), { parse: true })
 
   // start the mineflayer-web-inventory and prismarine-viewer on the ports the user specified
   if (inventoryViewerPort) inventoryViewer(bot, { port: inventoryViewerPort })
@@ -48,6 +52,13 @@ bot.on('message', (message) => {
   readlineLog(message.toAnsi())
 })
 
+bot.on('chat:command', ([[username, command]]) => {
+  // only allow approved people to control the bot
+  if (!acceptedControllers.includes(username)) return
+
+  executeCommand(command) // execute the line we just entered
+})
+
 bot.on('kicked', readlineLog)
 bot.on('error', readlineLog)
 
@@ -55,7 +66,7 @@ bot.on('error', readlineLog)
 rl.on('line', (line) => {
   readline.moveCursor(process.stdout, 0, -1) // move cursor up one line
   readline.clearScreenDown(process.stdout) // clear all the lines below the cursor (i.e. the last line we entered)
-  executeCommand(line.toString()) // sends the line we entered to ingame chat
+  executeCommand(line.toString()) // execute the line we just entered
 })
 
 
@@ -68,6 +79,7 @@ function executeCommand(commandLine) {
     commandModule = require(`./commands/${command}`)
   } 
   catch (error) { // we failed to load the command, send a color-coded message to the console
+    // readlineLog(error)
     readlineLog(`\u001b[91m Command \u001b[36m${command}\u001b[91m not recognized \u001b[0m`)
     return
   }
