@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 09/29/2023
+ * created by Jovan04. last updated 11/16/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -22,6 +22,8 @@ const { sleep, readlineLog, Queue } = require('./utils.js')
 // join the minecraft server
 const bot = mineflayer.createBot({ username, auth, host, port, version, defaultChatPatterns: false })
 bot.commandQueue = new Queue() // to be used later for a command queue
+bot.status = ''
+bot.isBusy = false
 
 // creates our readline interface with our console as input and output
 global.rl = readline.createInterface({
@@ -59,16 +61,16 @@ bot.on('chat:command', ([[username, command]]) => {
   executeCommand(command) // execute the line we just entered
 })
 
+// log bot error and kick messages
 bot.on('kicked', readlineLog)
 bot.on('error', readlineLog)
 
-
+// handle readline inputs
 rl.on('line', (line) => {
   readline.moveCursor(process.stdout, 0, -1) // move cursor up one line
   readline.clearScreenDown(process.stdout) // clear all the lines below the cursor (i.e. the last line we entered)
   executeCommand(line.toString()) // execute the line we just entered
 })
-
 
 function executeCommand(commandLine) {
   // parse the line we read into a command and args
@@ -79,10 +81,14 @@ function executeCommand(commandLine) {
     commandModule = require(`./commands/${command}`)
   } 
   catch (error) { // we failed to load the command, send a color-coded message to the console
-    // readlineLog(error)
-    readlineLog(`\u001b[91m Command \u001b[36m${command}\u001b[91m not recognized \u001b[0m`)
-    return
+    if (error.code === 'MODULE_NOT_FOUND') {
+      readlineLog(`\u001b[91m Command \u001b[36m${command}\u001b[91m not recognized \u001b[0m`)
+      return
+    } else {
+      readlineLog(error)
+      return
+    }
   }
 
-  commandModule(bot, args)
+  commandModule.func(bot, args)
 }
