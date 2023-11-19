@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/18/2023
+ * created by Jovan04. last updated 11/19/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -31,10 +31,17 @@ module.exports = {
 
     if (err) return // this is a janky solution to safely catch pathfinder errors - i'll need to come up with a better one
 
-    const chest = await bot.openBlock(bot.blockAt(base.chestLocation))
+    const chest = await bot.openBlock(bot.blockAt(base.chestLocation)).catch(e => {
+      readlineLog('\u001b[91m The bot enocountered an error while opening the Chest')
+      readlineLog(e, true)
+      err = true
+    })
 
+    if (err) return
+
+    // empty inventory into the chest, with a delay of 1/4 second between items
     for (const item of chest.items()) {
-      await chest.deposit(item.type, null, item.count).catch()
+      await chest.deposit(item.type, null, item.count).catch(e => { readlineLog(e, true) })
       await bot.waitForTicks(5)
     }
 

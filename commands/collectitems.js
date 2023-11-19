@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/18/2023
+ * created by Jovan04. last updated 11/19/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -46,8 +46,9 @@ module.exports = {
 
     const worldItems = Object.values(bot.entities).filter(ent => ent.name === 'item' && point.distanceTo(ent.position) <= range)
 
-    for (const point of sortPointsByGreedy(worldItems.map(i => i.position))) {
-      await bot.pathfinder.goto(new GoalNear(...point.toArray(), 1))
+    for (const point of sortPointsByGreedy(worldItems.map(i => i.position), bot.entity.position)) {
+      // pathfinder floors all Goals when passed in, so we round it ahead of time to ensure more accurate pickup
+      await bot.pathfinder.goto(new GoalNear(...point.rounded().toArray(), 1))
       await bot.waitForTicks(10)
     }
 

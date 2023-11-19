@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/16/2023
+ * created by Jovan04. last updated 11/19/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -16,18 +16,16 @@ module.exports = {
   description: 'Navigate bot to the bed at the specified Base, and sleep in it',
   func: async (bot, args) => {
     if (!args[0]) return readlineLog(`\u001b[91m Incorrect arguments. Usage: ${module.exports.usage} \u001b[0m`)
-    if (!bases[args[0]]) return readlineLog(`No base ${args[0]} found`)
+    const base = bases[args[0]]
+    if (!base) return readlineLog(`\u001b[91m No base ${args[0]} found \u001b[0m`)
   
-    const { x, y, z } = bases[args[0]].bedLocation
+    const { x, y, z } = base.bedLocation
   
-    if (!(x && y && z)) return readlineLog("No bed found")
+    if (!(x && y && z)) return readlineLog('\u001b[91m No bed found \u001b[0m')
   
-    readlineLog(`\u001b[36m Bot now going to coordinates x=${x}, y=${y}, z=${z} \u001b[0m`)
-  
-    await bot.pathfinder.goto(new GoalNear(x, y, z, 2)).catch(err => readlineLog(err))
-  
-    readlineLog(`\u001b[36m Bot going to sleep at base ${args[0]} \u001b[0m`)
-  
+    // stand on top of the bed
+    await bot.executeCommand(`goto coords ${x} ${y+1} ${z}`)
+    
     await bot.sleep(bot.blockAt(new Vec3(x, y, z))).catch(err => readlineLog(err))
   }
 }

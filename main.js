@@ -90,7 +90,10 @@ function executeCommand(commandLine) {
     }
   }
 
-  commandModule.func(bot, args)
+  const cmd = commandModule.func(bot, args)
+
+  // returning the promise so that running a command can be awaited
+  return cmd
 }
 
 // allow us to execute commands within other commands (recursive commands when?)

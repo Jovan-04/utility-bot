@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/18/2023
+ * created by Jovan04. last updated 11/19/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -7,6 +7,7 @@
  */
 
 const { Vec3 } = require('vec3')
+// const bases = require('./destinations/bases.js')
 
 class Destination {
   position // the position of the Destination
@@ -22,13 +23,13 @@ class Destination {
 // represent a location in the world the bot can harvest crops from
 class Farm extends Destination {
   // constants for reference to what crops and shapes of farms are supported
-  static SUPPORTED_CROPS = ['carrots', 'potatoes', 'wheat', 'beetroots', 'cocoa']
+  // cactus is also supported... except for the fact that cactus are prickly
+  static SUPPORTED_CROPS = ['carrots', 'potatoes', 'wheat', 'beetroots', 'cocoa', 'sugar_cane', 'pumpkin', 'melon']
   static SUPPORTED_SHAPES = ['square', 'rectangle', 'circle']
   static MEASUREMENT_NUMS = {
     square: 1,
     rectangle: 2,
     circle: 1,
-    oval: 2,
   }
   static VERT_DIST = 4 // blocks must be within 4 vertical blocks to be considered within the farm
 
@@ -37,6 +38,7 @@ class Farm extends Destination {
   crop  // string representing the block to harvest - one of `SUPPORTED_CROPS`
   shape // string representing the shape of the farm - one of `SUPPORTED_SHAPES`
   measurements = [] // side lengths of a square, diameter of a circle, etc.
+  base
 
   // advanced constructor for custom shapes
   constructor(name, position, crop, shape, measurements, baseToDeposit) {
@@ -54,6 +56,7 @@ class Farm extends Destination {
     })
 
     if (baseToDeposit !== undefined && typeof baseToDeposit !== 'string') throw new Error(`type of \`name\` must be 'string' or 'undefined', got ${typeof baseToDeposit}`)
+    // if (!bases[baseToDeposit]) throw new Error(`Base ${baseToDeposit} not recognized`) // can't check the Base because it makes a circular dependency
 
     // assign values
     this.name = name
@@ -61,6 +64,7 @@ class Farm extends Destination {
     this.crop = crop
     this.shape = shape
     this.measurements = measurements
+    this.base = baseToDeposit
   }
 
   // check if a point is inside our farm
