@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/16/2023
+ * created by Jovan04. last updated 11/18/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -92,3 +92,6 @@ function executeCommand(commandLine) {
 
   commandModule.func(bot, args)
 }
+
+// allow us to execute commands within other commands (recursive commands when?)
+bot.executeCommand = executeCommand

@@ -1,5 +1,5 @@
 /*
- * created by Jovan04. last updated 11/16/2023
+ * created by Jovan04. last updated 11/18/2023
  * you can contact me on Discord @jovan04 (legacy - Jovan04#8647)
  * github: https://github.com/Jovan-04/
  * 
@@ -22,7 +22,7 @@ class Destination {
 // represent a location in the world the bot can harvest crops from
 class Farm extends Destination {
   // constants for reference to what crops and shapes of farms are supported
-  static SUPPORTED_CROPS = ['carrots', 'potatoes', 'wheat', 'beetroots']
+  static SUPPORTED_CROPS = ['carrots', 'potatoes', 'wheat', 'beetroots', 'cocoa']
   static SUPPORTED_SHAPES = ['square', 'rectangle', 'circle']
   static MEASUREMENT_NUMS = {
     square: 1,
@@ -74,10 +74,15 @@ class Farm extends Destination {
     if (Math.abs(ty - oy) > Farm.VERT_DIST) return false
 
     if (this.shape === 'square') {
-      
       if ( (Math.abs(tx - ox) < this.measurements[0]) && (Math.abs(tz - oz) < this.measurements[0]) ) return true
+    }
 
-      return false
+    if (this.shape === 'rectangle') {
+      if ( (Math.abs(tx - ox) < this.measurements[0]) && (Math.abs(tz - oz) < this.measurements[1]) ) return true
+    }
+
+    if (this.shape === 'circle') {
+      if ( this.position.distanceTo(point) < this.measurements[0] ) return true
     }
 
     return false

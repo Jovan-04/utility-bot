@@ -1,11 +1,17 @@
 {
-  "username": "",
-  "auth": "",
-  "host": "",
+  "username": "username",
+  "auth": "microsoft",
+  "host": "localhost",
   "port": 25565,
-  "version": "",
+  "version": "1.18.2",
 
   "inventoryViewerPort": 3000,
   "worldViewerPort": 3001,
-  "worldViewerFirstPerson": false
+  "worldViewerFirstPerson": false,
+
+  "controlMessagesFromChat": true,
+  "acceptedControllers": ["Jovan04"],
+  "commandRegex": "(.+) whispers to you: (.+)",
+
+  "debugMessages": true
 }
